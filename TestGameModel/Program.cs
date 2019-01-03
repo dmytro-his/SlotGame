@@ -47,21 +47,21 @@ namespace TestGameModel
             }
 
             string resultInfo = $"ThreadID: {Thread.CurrentThread.ManagedThreadId}\n" +
-                                $"TaskID: {Task.CurrentId}\n";
+                                $"TaskID: {Task.CurrentId ?? 0}\n";
             decimal fullWin = 0;
             foreach (var wininfo in winningInfo)
             {
-                var name = $"X{wininfo.Key.Name.ToString()}";
+                var name = wininfo.Key.Name;
                 decimal count = wininfo.Value;
                 decimal coef = wininfo.Key.Multiplier;
                 fullWin += count * coef * bet.Count;
-                resultInfo += $"{Thread.CurrentThread.ManagedThreadId}|{Task.CurrentId}" +
+                resultInfo += $"{Thread.CurrentThread.ManagedThreadId}|{Task.CurrentId ?? 0}" +
                                 $"| {name}: {count} " +
-                                $"| Probability: {count / i} " +
-                                $"| return: {count * coef * bet.Count / i}\n";
+                                $"| Probability: {count / i:P5} " +
+                                $"| return: {count * coef * bet.Count / (i * bet.Count):P5}\n";
             }
 
-            resultInfo += $"{Thread.CurrentThread.ManagedThreadId}|{Task.CurrentId}| All return: {fullWin / (i * bet.Count)}\n";
+            resultInfo += $"{Thread.CurrentThread.ManagedThreadId}|{Task.CurrentId ?? 0}| All return: {fullWin / (i * bet.Count):P5}\n";
 
             Console.WriteLine(resultInfo);
         }
