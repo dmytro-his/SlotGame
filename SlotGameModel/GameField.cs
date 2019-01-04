@@ -20,58 +20,46 @@ namespace SlotGame.Model
         public readonly int RowsCount;
         public readonly int ColumnsCount;
         private readonly SignCollection _signCollection;
-        private readonly IEnumerable<WinValidator> _winValidators;
-
-        private GameField(int rows, int columns, SignCollection signCollection, IEnumerable<WinValidator> winValidators)
+        
+        internal GameField(int rows, int columns, SignCollection signCollection)
         {
             this.RowsCount = rows;
             this.ColumnsCount = columns;
             this._signCollection = signCollection;
-            this._winValidators = winValidators.OrderByDescending(validator=>validator.Multiplier);
 
             _signs = new Sign[rows][];
 
             for (int i = 0; i < rows; i++)
                 _signs[i] = new Sign[columns];
 
-            _generateSigns();
+            //GenerateSigns();
         }
-
-        internal WinValidator GetCurrentWin()
-        {
-            foreach(var validator in _winValidators)
-            {
-                if (validator.CheckForWin(this))
-                    return validator;
-            }
-            return new WinValidatorX0("X0");
-        }
-
-        private void _generateSigns()
+        
+        
+        public void GenerateSigns()
         {
             for (int i = 0; i < RowsCount; i++)
                 for (int j = 0; j < ColumnsCount; j++)
                     _signs[i][j] = _signCollection.GetRandomSign();
         }
 
-        public void ReRandom()
+        public override string ToString()
         {
-            _generateSigns();
+            var result = String.Empty;
+            for (int i = 0; i < RowsCount; i++)
+            {
+                for (int j = 0; j < ColumnsCount; j++)
+                {
+                    result += _signs[i][j].Name+"\t";
+                }
+                result += Environment.NewLine;
+            }
+            return result;
         }
 
-        internal static class Fabrica
+        public static explicit operator Sign[][](GameField gameField)
         {
-            internal static GameField GetRandomField
-                (
-                    int rows, 
-                    int columns, 
-                    SignCollection signCollection,
-                    WinValidator[] winValidators
-                )
-            {
-                return new GameField(rows, columns, signCollection, winValidators);
-            }
-            
+            return gameField._signs;    
         }
     }
 }

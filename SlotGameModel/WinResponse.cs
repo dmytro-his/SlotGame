@@ -13,7 +13,7 @@
             this.Name = name;
             this.Bet = bet;
             this.Multiplier = multiplier;
-            this.Win = multiplier > 1;
+            this.Win = multiplier >= 1;
             this.Profit = new Cash(bet.Currency, bet.Count * multiplier);
         }
 

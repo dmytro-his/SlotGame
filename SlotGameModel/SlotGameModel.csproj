@@ -2,6 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>SlotGame.Model</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="SignBase\SignCollection.cs~RF2522d719.TMP" />
+  </ItemGroup>
 
 </Project>

@@ -15,7 +15,12 @@ namespace SlotGame.Model
             this.Currency = currency;
             this.Count = count;
         }
-
+        
+        public Cash()
+        {
+            this.Currency = Currency.USD;
+            this.Count = 0;
+        }
         public override string ToString()
         {
             return $"{Count} {Currency}";
