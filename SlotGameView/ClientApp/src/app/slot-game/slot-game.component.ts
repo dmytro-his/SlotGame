@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { SlotGameService } from '../slot-game.service';
-import { Guid } from "guid-typescript";
+// import { Guid } from "guid-typescript";
 import { BetLevel } from '../game-model/BetLevelEnum';
 import { GameResponseOK } from '../game-model/GameResponseOK';
 declare var PIXI: any;
@@ -64,6 +64,7 @@ export class SlotGameComponent implements OnInit {
       var reelContainer = new PIXI.Container();
       service.Init().subscribe(serverData => {
 
+        
         console.log('initData');
         console.log(serverData);
 
@@ -163,10 +164,10 @@ export class SlotGameComponent implements OnInit {
         if (running) return;
 
         running = true;
-        var sessionId = Guid.parse('8182a03f-58e7-45a3-96f6-50d5809f9c6c');
+        // var sessionId = '8182a03f-58e7-45a3-96f6-50d5809f9c6c';
         var betLevel: BetLevel = BetLevel.x10;
 
-        service.Spin(sessionId, betLevel).subscribe(serverData => {
+        service.Spin(serverData.sessionId, betLevel).subscribe(serverData => {
           console.log(serverData.gameField);
 
           //generated random its hard work for brain. 

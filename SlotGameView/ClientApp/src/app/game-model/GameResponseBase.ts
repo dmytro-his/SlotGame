@@ -1,7 +1,7 @@
-import { Guid } from "guid-typescript";
+// import { Guid } from "guid-typescript";
 
 export class GameResponseBase {
-    public sessionId: Guid;
+    public sessionId: string;
 
     public statusResponse: StatusResponse;
 }

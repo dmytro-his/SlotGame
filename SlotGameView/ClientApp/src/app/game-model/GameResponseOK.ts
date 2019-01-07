@@ -1,9 +1,9 @@
 import { GameResponseBase } from "./GameResponseBase";
-import { Guid } from 'guid-typescript';
+// import { Guid } from 'guid-typescript';
 import { Cash } from './Cash';
 
 export class GameResponseOK implements GameResponseBase {
-    public sessionId: Guid;
+    public sessionId: string;
     public statusResponse: StatusResponse;
 
     public isWin: boolean;
