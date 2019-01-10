@@ -1,6 +1,8 @@
 import { GameResponseBase } from "./GameResponseBase";
 // import { Guid } from 'guid-typescript';
 import { Cash } from './Cash';
+import { SignName } from './SignName';
+import { StatusResponse } from './StatusResponse';
 
 export class GameResponseOK implements GameResponseBase {
     public sessionId: string;

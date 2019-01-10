@@ -33,7 +33,7 @@ namespace SlotGame.Model
         }
 
 
-        public Sign GetRandomSign()
+        public SignName GetRandomSign()
         {
             //if (!CheckValidation())
             //    throw new Exception("Sum of Probabilities must be 100");
@@ -47,7 +47,7 @@ namespace SlotGame.Model
                 currentSum += this._signs[i].Probability;
 
                 if (currentSum >= rand)
-                    return this._signs[i];
+                    return this._signs[i].Name;
             }
 
             throw new NotImplementedException("Out Random Exception");
@@ -57,15 +57,15 @@ namespace SlotGame.Model
 
         public static SignCollection Default = new SignCollection
             {
-                new Sign(SignName.HappyCharH, 13.0m),
-                new Sign(SignName.HappyCharA, 13.0m),
-                new Sign(SignName.HappyCharP, 13.0m),
-                new Sign(SignName.HappyCharY, 13.0m),
+                new Sign(SignName.HappyCharH, 14.3m),
+                new Sign(SignName.HappyCharA, 14.3m),
+                new Sign(SignName.HappyCharP, 14.3m),
+                new Sign(SignName.HappyCharY, 14.3m),
 
-                new Sign(SignName.HappyFace1, 19.0m),
-                new Sign(SignName.HappyFace2, 19.0m),
+                new Sign(SignName.HappyFace1, 15.6m),
+                new Sign(SignName.HappyFace2, 15.6m),
 
-                new Sign(SignName.HappyVip, 10.0m)
+                new Sign(SignName.HappyVip, 11.6m)
             };
     }
 }

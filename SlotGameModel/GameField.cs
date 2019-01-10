@@ -7,9 +7,9 @@ namespace SlotGame.Model
 {
     public class GameField
     {
-        private readonly Sign[][] _signs;
+        private readonly  SignName[][] _signs;
 
-        public Sign this[int i, int j]
+        public SignName this[int i, int j]
         {
             get
             {
@@ -27,10 +27,10 @@ namespace SlotGame.Model
             this.ColumnsCount = columns;
             this._signCollection = signCollection;
 
-            _signs = new Sign[rows][];
+            _signs = new SignName[rows][];
 
             for (int i = 0; i < rows; i++)
-                _signs[i] = new Sign[columns];
+                _signs[i] = new SignName[columns];
 
             //GenerateSigns();
         }
@@ -50,14 +50,14 @@ namespace SlotGame.Model
             {
                 for (int j = 0; j < ColumnsCount; j++)
                 {
-                    result += _signs[i][j].Name+"\t";
+                    result += _signs[i][j] +"\t";
                 }
                 result += Environment.NewLine;
             }
             return result;
         }
 
-        public static explicit operator Sign[][](GameField gameField)
+        public static explicit operator SignName[][](GameField gameField)
         {
             return gameField._signs;    
         }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace SlotGame.Model
 {
@@ -26,25 +28,31 @@ namespace SlotGame.Model
                 switch (sign)
                 {
                     case SignName.HappyVip:
-                        multiplier = 5;
+                        multiplier = 6;
                         break;
                     case SignName.HappyFace1:
                     case SignName.HappyFace2:
-                        multiplier = 3;
+                        multiplier = 2;
                         break;
                     case SignName.HappyCharH:
                     case SignName.HappyCharA:
                     case SignName.HappyCharP:
                     case SignName.HappyCharY:
-                        multiplier = 2;
-                        break;
+                        multiplier = 4;
+                        WinValidators.Add(new WinValidatorComplexColumn($"{sign.ToString()}*{5}", sign, 5, multiplier * coefForComplexColumn));
+                        WinValidators.Add(new WinValidatorSignRow(sign, multiplier * coefForRow));
+
+                        continue;
                 }
+
+                for (int i = 4; i <= 15; i++)
+                    WinValidators.Add(new WinValidatorCount($"{sign.ToString()} (Count {i})", sign, i, multiplier/2*(i - 2)));
                 WinValidators.Add(new WinValidatorComplexColumn($"{sign.ToString()}*{5}", sign, 5, multiplier * coefForComplexColumn));
                 WinValidators.Add(new WinValidatorSignRow(sign, multiplier * coefForRow));
                 WinValidators.Add(new WinValidatorSignColumn(sign, multiplier * coefForColumn));
             }
 
-            WinValidators.Add(new WinValidatorHappyRow(100));
+            WinValidators.Add(new WinValidatorHappyRow(50));
             WinValidators.Add(new WinValidatorX0("X0"));
         }
 
@@ -60,7 +68,7 @@ namespace SlotGame.Model
         private WinResponse Spin()
         {
             GameField.GenerateSigns();
-
+            
             var winValidator = WinValidators.CheckWin(GameField);
 
             return new WinResponse(winValidator.Name, new Cash(), winValidator.Multiplier);
@@ -71,8 +79,7 @@ namespace SlotGame.Model
         {
             Cash.Count -= bet.Count;
             GameField.GenerateSigns();
-
-
+            
             var winValidator = WinValidators.CheckWin(GameField);
 
             Cash.Count += bet.Count * winValidator.Multiplier;

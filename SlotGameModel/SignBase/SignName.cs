@@ -7,13 +7,13 @@
         //Simple3,
         //Simple4,
         //Vip1,
-    
-        HappyVip,
-        HappyFace1,
-        HappyFace2,
+
         HappyCharH,
         HappyCharA,
         HappyCharP,
-        HappyCharY
+        HappyCharY,
+        HappyFace1,
+        HappyFace2,
+        HappyVip
     }
 }

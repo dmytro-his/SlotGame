@@ -22,7 +22,7 @@
             {
                 tempResult = false;
                 for (int j = 0; j < gameField.RowsCount; j++)
-                    if (gameField[j, i].Name == _wantedSign)
+                    if (gameField[j, i] == _wantedSign)
                     {
                         tempResult = true;
                         break;

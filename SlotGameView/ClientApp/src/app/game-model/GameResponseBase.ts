@@ -1,3 +1,5 @@
+import { StatusResponse } from './StatusResponse';
+
 // import { Guid } from "guid-typescript";
 
 export class GameResponseBase {

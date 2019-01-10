@@ -8,10 +8,37 @@ using System.Threading.Tasks;
 
 namespace TestGameModel
 {
+    class Lol
+    {
+        public int Mult;
+
+        public Lol(int mult)
+        {
+            this.Mult = mult;
+        }
+        public bool Check()
+        {
+            return Mult == 5;
+        }
+    }
     class Program
     {
         static void Main(string[] args)
         {
+            
+            //List<Lol> list = new List<Lol>() {
+            //    new Lol(1),
+            //    new Lol(5),
+            //    new Lol(10),
+            //    new Lol(-5),
+            //    new Lol(3),
+            //    new Lol(2),
+            //    new Lol(6),
+            //    new Lol(1)
+            //};
+            //Console.WriteLine(list.OrderByDescending(v=>v.Mult).ThenBy(v=>Guid.NewGuid()).First(v=>v.Check()).Mult);
+            //Console.WriteLine(list.OrderByDescending(v => v.Mult).ThenBy(v => Guid.NewGuid()).ToList().First(v=>v.Check()).Mult);
+            //return;
             int spinCount = 100000;
             int cashCount = 100000;
             Cash bet = new Cash(Currency.EUR, 100);
@@ -64,8 +91,8 @@ namespace TestGameModel
                 //if (game.Cash.Count < 0)
                 //    break;
 
-                //if(i%(spinCount/100)==0)
-                //    Console.WriteLine(i / (spinCount / 100));
+                if (i % (spinCount / 100) == 0)
+                    Console.WriteLine(i / (spinCount / 100));
             }
 
             string resultInfo = String.Empty;

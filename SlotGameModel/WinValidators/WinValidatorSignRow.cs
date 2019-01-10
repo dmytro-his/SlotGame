@@ -19,7 +19,7 @@
             for (int i = 0; i < gameField.RowsCount; i++)
             {
                 for (int j = 0; j < gameField.ColumnsCount; j++)
-                    if (gameField[i, j].Name != _wantedSign)
+                    if (gameField[i, j] != _wantedSign)
                         goto nextRow;
 
                 return true;

@@ -16,11 +16,11 @@
         {
             for (int i = 0; i < gameField.RowsCount; i++)
             {
-                if (gameField[i, 0].Name == SignName.HappyCharH &&
-                    gameField[i, 1].Name == SignName.HappyCharA &&
-                    gameField[i, 2].Name == SignName.HappyCharP &&
-                    gameField[i, 3].Name == SignName.HappyCharP &&
-                    gameField[i, 4].Name == SignName.HappyCharY)
+                if (gameField[i, 0] == SignName.HappyCharH &&
+                    gameField[i, 1] == SignName.HappyCharA &&
+                    gameField[i, 2] == SignName.HappyCharP &&
+                    gameField[i, 3] == SignName.HappyCharP &&
+                    gameField[i, 4] == SignName.HappyCharY)
                     return true;
             }
             return false;

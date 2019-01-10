@@ -7,7 +7,7 @@ namespace SlotGame.Model
 {
     public class Sign
     {
-        public SignName Name { get; }
+        public SignName Name { get; set; }
 
         public decimal Probability { get; }
 

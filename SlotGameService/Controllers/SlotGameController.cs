@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +37,7 @@ namespace SlotGameService.Controllers
                 IsWin = false,
                 Multiplier = 0,
                 Profit = new Cash(),
-                GameField = ((Sign[][])game.GameField).Select(s => s.Select(s2 => s2.Name).ToArray()).ToArray()
+                GameField = (SignName[][])game.GameField
             };
             // }
             // catch (Exception e)
@@ -47,16 +48,16 @@ namespace SlotGameService.Controllers
 
         //[Route("spin/")]
         //[HttpGet]
-        public Response Spin([BindRequired, FromQuery]Guid sessionId, [BindRequired, FromQuery]BetLevel betLevel)
+        public Response Spin([BindRequired, FromQuery]Guid sessionId, [BindRequired, FromQuery]decimal bet)
         {
             var game = this._repository.GetGame(sessionId);
 
-            var bet = new Cash(game.Cash.Currency, betLevel.GetBet());
+            var betCash = new Cash(game.Cash.Currency, bet);
 
             if (game == null)
                 return new ErrorResponse(sessionId == null ? Guid.Empty : sessionId, new NullReferenceException("You are not initialize"));
 
-            var winResponse = game.Spin(bet);
+            var winResponse = game.Spin(betCash);
 
             return new SpinResponse(sessionId)
             {
@@ -65,7 +66,7 @@ namespace SlotGameService.Controllers
                 IsWin = winResponse.Win,
                 Multiplier = winResponse.Multiplier,
                 Profit = winResponse.Profit,
-                GameField = ((Sign[][])game.GameField).Select(s => s.Select(s2 => s2.Name).ToArray()).ToArray()
+                GameField = (SignName[][])game.GameField
             };
         }
     }

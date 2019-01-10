@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SlotGame.Model
@@ -26,7 +27,13 @@ namespace SlotGame.Model
 
         internal WinValidator CheckWin(GameField gameField)
         {
-            return this.OrderByDescending(v => v.Multiplier).ThenBy(v=>Guid.NewGuid()).First(v => v.CheckForWin(gameField));
+            //foreach (var validator in this.OrderByDescending(v => v.Multiplier).ThenByDescending(v => Guid.NewGuid()))
+            //{
+            //    if (validator.CheckForWin(gameField))
+            //        return validator;
+            //}
+            //return null;
+            return this.OrderByDescending(v => v.Multiplier).ThenByDescending(v => Guid.NewGuid()).ToList().First(v => v.CheckForWin(gameField));
         }
     }
 }
