@@ -13,18 +13,18 @@ export class GameViewModel {
     private sessionId: string;
     public gameField: SignName[][];
     public cash: Cash;
-    public bet: Cash;
+    private bet: Cash;
     public lastSpinResult: SpinResult;
 
+
     public onSpinEvent: LiteEvent<void>;
-    
 
     constructor(private service: ISlotGameService) {
 
         this.lastSpinResult = new SpinResult();
-        this.bet=new Cash();
-        this.bet.count=100;
-        this.bet.currency=Currency.USD;
+        this.bet = new Cash();
+        this.bet.count = 100;
+        this.bet.currency = Currency.USD;
 
         this.gameField = [];
         for (var i = 0; i < 3; i++) {
@@ -33,7 +33,7 @@ export class GameViewModel {
                 this.gameField[i][j] = SignName.HappyVip;
             }
         }
-        this.onSpinEvent=new LiteEvent<void>();
+        this.onSpinEvent = new LiteEvent<void>();
         this.Init();
     }
 
@@ -45,7 +45,9 @@ export class GameViewModel {
             this.sessionId = serverData.sessionId;
 
             this.gameField = serverData.gameField;
-            this.cash = serverData.cash;
+            this.cash = new Cash();
+            this.cash.count=serverData.cash.count;
+            this.cash.currency=serverData.cash.currency;
 
             this.lastSpinResult.bet = serverData.bet;
             this.lastSpinResult.gameField = serverData.gameField;
@@ -63,7 +65,8 @@ export class GameViewModel {
                 return;
 
             this.gameField = serverData.gameField;
-            this.cash = serverData.cash;
+            this.cash.count=serverData.cash.count;
+            this.cash.currency=serverData.cash.currency;
 
             this.lastSpinResult.bet = serverData.bet;
             this.lastSpinResult.gameField = serverData.gameField;

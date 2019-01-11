@@ -4,8 +4,16 @@ import { SlotGameService } from '../slot-game.service';
 import { GameResponseOK } from '../game-model/GameResponseOK';
 import { Cash } from '../game-model/Cash';
 import { GameViewModel } from '../game-model/ViewModels/GameViewModel';
-import { WeatherViewModel } from '../game-model/ViewModels/WeatherViewModel';
+import { Currency } from '../game-model/Currency';
+
+/// <reference path="node_modules/pixi-particles/ambient.d.ts" />
+require('pixi-particles');
+
+
+
 declare var PIXI: any;
+declare var require: any
+
 
 
 @Component({
@@ -17,7 +25,6 @@ declare var PIXI: any;
 export class SlotGameComponent implements OnInit {
 
   private gameViewModel: GameViewModel;
-  private weatherViewModel:WeatherViewModel;
 
   @ViewChild('pixiContainer') pixiContainer;
 
@@ -25,12 +32,13 @@ export class SlotGameComponent implements OnInit {
    *
    */
   constructor(private service: SlotGameService) {
-
+    
     this.gameViewModel = new GameViewModel(service);
   }
   ngOnInit() {
 
     var MARGIN_TOP = 50;
+    var LEFT_SHIFT = 0;
     var ROW_COUNT = 3;
 
     // create a new Sprite from an image path
@@ -46,15 +54,27 @@ export class SlotGameComponent implements OnInit {
       .add("assets/signs/HappyVip.png", "assets/signs/HappyVip.png")
 
       .add("assets/buttons/spinButton.png", "assets/buttons/spinButton.png")
+      .add("assets/buttons/rock.png", "assets/buttons/rock.png")
       .add("assets/buttons/plusButton.png", "assets/buttons/plusButton.png")
+      .add("assets/buttons/minusButton.png", "assets/buttons/minusButton.png")
 
-      .add("assets/bg/background.jpg", "assets/bg/background.jpeg")
+      .add("backGroungImage0", "assets/bg/backImages/background0.jpg")
+      .add("backGroungImage1", "assets/bg/backImages/background1.jpg")
+      .add("backGroungImage2", "assets/bg/backImages/background2.jpg")
+      .add("backGroungImage3", "assets/bg/backImages/background3.png")
+      .add("backGroungImage4", "assets/bg/backImages/background4.jpg")
+      .add("backGroungImage5", "assets/bg/backImages/background5.jpg")
+      .add("backGroungImage6", "assets/bg/backImages/background6.jpg")
 
       .add("assets/bg/allReelsMask.gif", "assets/bg/allReelsMask.gif")
       .add("assets/bg/blackCells.jpg", "assets/bg/blackCells.jpg")
 
       .add("assets/bg/centerReelMask.gif", "assets/bg/centerReelMask_2.gif")
       .add("assets/bg/whiteCells.jpg", "assets/bg/whiteCells.jpg")
+      .add("assets/bg/snowFlake.png", "assets/bg/snowFlake.png")
+      .add("assets/bg/smoke.png", "assets/bg/smoke.png")
+      .add("assets/bg/fire.png", "assets/bg/fire.png")
+      .add("assets/bg/particle.png", "assets/bg/particle.png")
       .load(onAssetsLoaded.bind(this));
 
     var REEL_WIDTH = 170;
@@ -113,8 +133,21 @@ export class SlotGameComponent implements OnInit {
         PIXI.Texture.fromImage("assets/signs/HappyVip.png")
       ];
 
-      var bg = PIXI.Sprite.fromImage('assets/bg/background.jpg');
-      app.stage.addChild(bg);
+
+      var bgImages = [
+        PIXI.Texture.fromFrame('backGroungImage0'),
+        PIXI.Texture.fromFrame('backGroungImage1'),
+        PIXI.Texture.fromFrame('backGroungImage2'),
+        PIXI.Texture.fromFrame('backGroungImage3'),
+        PIXI.Texture.fromFrame('backGroungImage4'),
+        PIXI.Texture.fromFrame('backGroungImage5'),
+        PIXI.Texture.fromFrame('backGroungImage6')
+      ];
+      var backStage = PIXI.Sprite.fromImage('');
+      backStage.texture = bgImages[0];
+
+      app.stage.addChild(backStage);
+
 
       //Build the reels
       var reelContainer = new PIXI.Container();
@@ -139,7 +172,7 @@ export class SlotGameComponent implements OnInit {
           var symbol;
 
           if (j > 0 && j < 4)
-            symbol = new PIXI.Sprite(slotTextures[this.gameViewModel.gameField[j-1][i]])
+            symbol = new PIXI.Sprite(slotTextures[this.gameViewModel.gameField[j - 1][i]])
           else
             symbol = new PIXI.Sprite(slotTextures[6]);
 
@@ -162,6 +195,12 @@ export class SlotGameComponent implements OnInit {
       var centerReelMask = PIXI.Sprite.fromImage('assets/bg/centerReelMask.gif');
       var whiteCells = PIXI.Sprite.fromImage('assets/bg/whiteCells.jpg');
 
+      allReelMask.y = MARGIN_TOP;
+      centerReelMask.y = MARGIN_TOP;
+
+      allReelMask.x = -LEFT_SHIFT;
+      centerReelMask.x = -LEFT_SHIFT;
+
       blackCells.alpha = 0.5;
       blackCells.mask = allReelMask;
 
@@ -176,38 +215,53 @@ export class SlotGameComponent implements OnInit {
 
       //Build top & bottom covers and position reelContainer
       var margin = (app.screen.height - SYMBOL_SIZE * ROW_COUNT) / 2;
-      reelContainer.y = MARGIN_TOP;
-      reelContainer.x = Math.round(app.screen.width - reelContainer.width) / 2;
+      reelContainer.y = 2 * MARGIN_TOP;
+      reelContainer.x = Math.round(app.screen.width - reelContainer.width) / 2 - LEFT_SHIFT;
+
+      var betSettingsContainer = new PIXI.Container();
+      var betInfo = PIXI.Sprite.fromImage('assets/buttons/rock.png');
+      betInfo.scale.x = 1.5;
 
 
-      var spinButton = PIXI.Sprite.fromImage('assets/buttons/spinButton.png');
-      spinButton.width = 200;
-      spinButton.height = 100;
-      // spinButton.cursor = 'hover';
-      spinButton.x = Math.round((app.screen.width - spinButton.width) / 2); //center x
-      spinButton.y = app.screen.height - (margin + spinButton.height) / 2; // center by bottom y
-      spinButton.interactive = true;
-
-      spinButton.on('pointerdown', () => {
-        if (running) return;
-        
-        running = true;
-        console.log(this.gameViewModel);
-        this.gameViewModel.Spin();
+      var style = new PIXI.TextStyle({
+        fontFamily: 'Arial',
+        fontSize: 15,
+        fontStyle: 'italic',
+        fontWeight: 'bold',
+        fill: ['#ffffff'], // gradient
+        stroke: '#4a1850',
+        align: 'center '
+      });
+      var betText = new PIXI.Text(`Bet:\n${this.gameViewModel.bet.count}`, style);
+      betText.x = 35;
+      betText.y = 30;
+      betInfo.addChild(betText);
+      betInfo.interactive = true;
+      betInfo.on('pointerdown', () => {
+        var index = bgImages.indexOf(backStage.texture) + 1 == bgImages.length ? 0 : bgImages.indexOf(backStage.texture) + 1;
+        backStage.texture = bgImages[index];
       })
-        .on('pointerover', () => spinButton.alpha = 0.3)
-        .on('pointerout', () => spinButton.alpha = 1);
+        .on('pointerover', () => betInfo.alpha = 0.8)
+        .on('pointerout', () => betInfo.alpha = 1);
 
+
+      betSettingsContainer.addChild(betInfo);
+      betSettingsContainer.x = 300;
+      betSettingsContainer.y = app.screen.height - 100;
+
+      this.gameViewModel.bet.onChangeEvent.subscribe(() => betText.text = `Bet:\n${this.gameViewModel.bet.count}`);
 
       var plusBetButton = PIXI.Sprite.fromImage('assets/buttons/plusButton.png');
       plusBetButton.width = 50;
       plusBetButton.height = 50;
+      plusBetButton.x = 150; //center x
+      plusBetButton.y = plusBetButton.height / 2; // center by bottom y
       // plusBetButton.defaultCursor  = 'pointer';
-      plusBetButton.x = 300; //center x
-      plusBetButton.y = app.screen.height - (margin + plusBetButton.height) / 2; // center by bottom y
       plusBetButton.interactive = true;
-      plusBetButton.on('pointerdown', () => { })
-        .on('pointerover', () => plusBetButton.alpha = 0.3)
+      plusBetButton.on('pointerdown', () => {
+        this.gameViewModel.bet.count += 20;
+      })
+        .on('pointerover', () => plusBetButton.alpha = 0.6)
         .on('pointerout', () => plusBetButton.alpha = 1);
 
 
@@ -215,17 +269,356 @@ export class SlotGameComponent implements OnInit {
       minusBetButton.width = 50;
       minusBetButton.height = 50;
       // plusBetButton.defaultCursor  = 'pointer';
-      minusBetButton.x = 500; //center x
-      minusBetButton.y = app.screen.height - (margin + minusBetButton.height) / 2; // center by bottom y
+      minusBetButton.x = -50; //center x
+      minusBetButton.y = minusBetButton.height / 2; // center by bottom y
       minusBetButton.interactive = true;
-      minusBetButton.on('pointerdown', () => { })
-        .on('pointerover', () => plusBetButton.alpha = 0.3)
-        .on('pointerout', () => plusBetButton.alpha = 1);
+      minusBetButton.on('pointerdown', () => {
+        this.gameViewModel.bet.count -= 20;
+      })
+        .on('pointerover', () => minusBetButton.alpha = 0.6)
+        .on('pointerout', () => minusBetButton.alpha = 1);
 
 
-      app.stage.addChild(minusBetButton);
-      app.stage.addChild(plusBetButton);
+      betSettingsContainer.addChild(minusBetButton);
+      betSettingsContainer.addChild(plusBetButton);
+
+
+      app.stage.addChild(betSettingsContainer);
+
+      var spinButton = PIXI.Sprite.fromImage('assets/buttons/spinButton.png');
+      spinButton.width = 200;
+      spinButton.height = 100;
+      // spinButton.cursor = 'hover';
+      spinButton.x = Math.round((app.screen.width - spinButton.width) / 2) - LEFT_SHIFT; //center x
+      spinButton.y = app.screen.height - (margin + spinButton.height) / 2; // center by bottom y
+      spinButton.interactive = true;
+
+      spinButton.on('pointerdown', () => {
+       if (running) return;
+
+        running = true;
+        console.log(this.gameViewModel);
+        this.gameViewModel.Spin();
+      })
+        .on('pointerover', () => spinButton.alpha = 0.6)
+        .on('pointerout', () => spinButton.alpha = 1);
+
       app.stage.addChild(spinButton);
+
+
+
+      var cashInfo = PIXI.Sprite.fromImage('assets/buttons/rock.png');
+      cashInfo.scale.x = 1.5;
+      cashInfo.x = app.screen.width / 2 + 200;
+      cashInfo.y = app.screen.height - (margin + cashInfo.height) / 2;
+
+      var cashText = new PIXI.Text(`Cash:\n${this.gameViewModel.cash.count}`, style);
+      cashText.x = 35;
+      cashText.y = 30;
+      cashInfo.addChild(cashText);
+      cashInfo.interactive = true;
+      cashInfo.on('pointerover', () => cashText.text = Currency[this.gameViewModel.cash.currency].toString())
+        .on('pointerout', () => cashText.text = `Cash:\n${this.gameViewModel.cash.count}`);
+
+      app.stage.addChild(cashInfo);
+
+      this.gameViewModel.cash.onChangeEvent.subscribe(() => cashText.text = `Cash:\n${this.gameViewModel.cash.count}`);
+      var frontStage = PIXI.Sprite.fromImage('');
+      app.stage.addChild(frontStage);
+      // Create a new emitter
+      // addEmmiterOn(bg);
+      var snowFlake = PIXI.Texture.fromImage('assets/bg/snowFlake.png');
+      // snowFlake.scale.x
+      addEmmiter(backStage, [PIXI.Texture.fromImage('assets/bg/smoke.png')], {
+        "alpha": {
+          "start": 0.1,
+          "end": 0.1
+        },
+        "scale": {
+          "start": 0.15,
+          "end": 0.2,
+          "minimumScaleMultiplier": 0.5
+        },
+        "color": {
+          "start": "ffffff",
+          "end": "ffffff"
+        },
+        "speed": {
+          "start": -100,
+          "end": -100
+        },
+        "startRotation": {
+          "min": 50,
+          "max": 100
+        },
+        "rotationSpeed": {
+          "min": 0,
+          "max": 0
+        },
+        "lifetime": {
+          "min": 10,
+          "max": 10
+        },
+        "blendMode": "normal",
+        "ease": [
+          {
+            "s": 0,
+            "cp": 0.379,
+            "e": 0.548
+          },
+          {
+            "s": 0.548,
+            "cp": 0.717,
+            "e": 0.676
+          },
+          {
+            "s": 0.676,
+            "cp": 0.635,
+            "e": 1
+          }
+        ],
+        "frequency": 0.01,
+        "emitterLifetime": 0,
+        "maxParticles": 1000,
+        "pos": {
+          "x": 500,
+          "y": 50
+        },
+        "addAtBack": false,
+        "spawnType": "rect",
+        "spawnRect": {
+          "x": -500,
+          "y": 1000,
+          "w": 1800,
+          "h": 20
+        }
+      });
+
+      addEmmiter(backStage, [snowFlake], {
+        "alpha": {
+          "start": 0.73,
+          "end": 0.46
+        },
+        "scale": {
+          "start": 0.05,
+          "end": 0.1,
+          "minimumScaleMultiplier": 0.1
+        },
+        "color": {
+          "start": "ffffff",
+          "end": "ffffff"
+        },
+        "speed": {
+          "start": 30,
+          "end": 30
+        },
+        "startRotation": {
+          "min": 50,
+          "max": 100
+        },
+        "rotationSpeed": {
+          "min": 0,
+          "max": 0
+        },
+        "lifetime": {
+          "min": 20,
+          "max": 20
+        },
+        "blendMode": "normal",
+        "ease": [
+          {
+            "s": 0,
+            "cp": 0.379,
+            "e": 0.548
+          },
+          {
+            "s": 0.548,
+            "cp": 0.717,
+            "e": 0.676
+          },
+          {
+            "s": 0.676,
+            "cp": 0.635,
+            "e": 1
+          }
+        ],
+        "frequency": 0.1,
+        "emitterLifetime": 0,
+        "maxParticles": 1000,
+        "pos": {
+          "x": 500,
+          "y": 50
+        },
+        "addAtBack": true,
+        "spawnType": "rect",
+        "spawnRect": {
+          "x": -500,
+          "y": -100,
+          "w": 1800,
+          "h": 20
+        }
+      });
+
+
+      addEmmiter(frontStage, [snowFlake], {
+        "alpha": {
+          "start": 0.73,
+          "end": 0.46
+        },
+        "scale": {
+          "start": 0.15,
+          "end": 0.2,
+          "minimumScaleMultiplier": 0.1
+        },
+        "color": {
+          "start": "ffffff",
+          "end": "ffffff"
+        },
+        "speed": {
+          "start": 70,
+          "end": 70
+        },
+        "startRotation": {
+          "min": 50,
+          "max": 100
+        },
+        "rotationSpeed": {
+          "min": 0,
+          "max": 0
+        },
+        "lifetime": {
+          "min": 10,
+          "max": 10
+        },
+        "blendMode": "normal",
+        "ease": [
+          {
+            "s": 0,
+            "cp": 0.379,
+            "e": 0.548
+          },
+          {
+            "s": 0.548,
+            "cp": 0.717,
+            "e": 0.676
+          },
+          {
+            "s": 0.676,
+            "cp": 0.635,
+            "e": 1
+          }
+        ],
+        "frequency": 0.1,
+        "emitterLifetime": 0,
+        "maxParticles": 1000,
+        "pos": {
+          "x": 500,
+          "y": 50
+        },
+        "addAtBack": true,
+        "spawnType": "rect",
+        "spawnRect": {
+          "x": -500,
+          "y": -100,
+          "w": 1800,
+          "h": 20
+        }
+      });
+
+
+      addEmmiter(backStage, [PIXI.Texture.fromImage('assets/bg/particle.png'), PIXI.Texture.fromImage('assets/bg/fire.png')],
+        {
+          "alpha": {
+            "start": 0.62,
+            "end": 0
+          },
+          "scale": {
+            "start": 0.25,
+            "end": 0.75
+          },
+          "color": {
+            //this list is turned into a 5 step gradient inside ParticleExample with
+            //PIXI.particles.createSteppedGradient() after the emitter is created
+            "list": [
+              { "value": "fff191", "time": 0 },
+              { "value": "ff622c", "time": 1 }
+            ],
+            "isStepped": false
+          },
+          "speed": {
+            "start": 50,
+            "end": 50
+          },
+          "startRotation": {
+            "min": 265,
+            "max": 275
+          },
+          "rotationSpeed": {
+            "min": 50,
+            "max": 50
+          },
+          "lifetime": {
+            "min": 0.5,
+            "max": 1.3
+          },
+          "blendMode": "normal",
+          "frequency": 0.001,
+          "emitterLifetime": 0,
+          "maxParticles": 500,
+          "pos": {
+            "x": 0,
+            "y": 0
+          },
+          "addAtBack": false,
+          "spawnType": "rect",
+          "spawnRect": {
+            "x": 0,
+            "y": 750,
+            "w": 2000,
+            "h": 20
+          }
+        });
+
+
+      function addEmmiter(container, sprites, settings) {
+        var emitter = new PIXI.particles.Emitter(
+          // The PIXI.Container to put the emitter in
+          // if using blend modes, it's important to put this
+          // on top of a bitmap, and not use the root stage Container
+          container,
+          // The collection of particle images to use
+          sprites,
+          // Emitter configuration, edit this to change the look
+          // of the emitter
+          settings
+        );
+
+        // Calculate the current time
+        var elapsed = Date.now();
+
+        // Update function every frame
+        var update = function () {
+
+          // Update the next frame
+          requestAnimationFrame(update);
+
+          var now = Date.now();
+
+          // The emitter requires the elapsed
+          // number of seconds since the last update
+          emitter.update((now - elapsed) * 0.001);
+          elapsed = now;
+
+          // Should re-render the PIXI Stage
+          // renderer.render(stage);
+        };
+
+        // Start emitting
+        emitter.emit = true;
+
+        // Start the update
+        update();
+      }
 
     }
     //Very simple tweening utility function. This should be replaced with a proper tweening library in a real product.
@@ -244,7 +637,12 @@ export class SlotGameComponent implements OnInit {
       };
 
       tweening.push(tween);
+
     }
+
+
+
+
 
     //#region  animation functions 
     app.ticker.add(function () {

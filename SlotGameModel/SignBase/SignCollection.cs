@@ -57,15 +57,15 @@ namespace SlotGame.Model
 
         public static SignCollection Default = new SignCollection
             {
-                new Sign(SignName.HappyCharH, 14.3m),
-                new Sign(SignName.HappyCharA, 14.3m),
-                new Sign(SignName.HappyCharP, 14.3m),
-                new Sign(SignName.HappyCharY, 14.3m),
+                new Sign(SignName.HappyCharH, 14.6m),
+                new Sign(SignName.HappyCharA, 14.6m),
+                new Sign(SignName.HappyCharP, 14.6m),
+                new Sign(SignName.HappyCharY, 14.6m),
 
-                new Sign(SignName.HappyFace1, 15.6m),
-                new Sign(SignName.HappyFace2, 15.6m),
+                new Sign(SignName.HappyFace1, 15.4m),
+                new Sign(SignName.HappyFace2, 15.4m),
 
-                new Sign(SignName.HappyVip, 11.6m)
+                new Sign(SignName.HappyVip, 11.0m)
             };
     }
 }

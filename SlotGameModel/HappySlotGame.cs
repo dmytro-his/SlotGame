@@ -45,8 +45,13 @@ namespace SlotGame.Model
                         continue;
                 }
 
-                for (int i = 4; i <= 15; i++)
-                    WinValidators.Add(new WinValidatorCount($"{sign.ToString()} (Count {i})", sign, i, multiplier/2*(i - 2)));
+                for (int i = 5; i <= 15; i++)
+                {
+                    if (sign == SignName.HappyVip)
+                        WinValidators.Add(new WinValidatorCount($"{sign.ToString()} (Count {i})", sign, i, multiplier / 3 * (i - 2)));
+                    else
+                        WinValidators.Add(new WinValidatorCount($"{sign.ToString()} (Count {i})", sign, i, multiplier / 2 * (i - 2)));
+                }
                 WinValidators.Add(new WinValidatorComplexColumn($"{sign.ToString()}*{5}", sign, 5, multiplier * coefForComplexColumn));
                 WinValidators.Add(new WinValidatorSignRow(sign, multiplier * coefForRow));
                 WinValidators.Add(new WinValidatorSignColumn(sign, multiplier * coefForColumn));
@@ -68,7 +73,7 @@ namespace SlotGame.Model
         private WinResponse Spin()
         {
             GameField.GenerateSigns();
-            
+
             var winValidator = WinValidators.CheckWin(GameField);
 
             return new WinResponse(winValidator.Name, new Cash(), winValidator.Multiplier);
@@ -79,11 +84,11 @@ namespace SlotGame.Model
         {
             Cash.Count -= bet.Count;
             GameField.GenerateSigns();
-            
+
             var winValidator = WinValidators.CheckWin(GameField);
 
             Cash.Count += bet.Count * winValidator.Multiplier;
-            
+
             return new WinResponse(winValidator.Name, bet, winValidator.Multiplier);
         }
 

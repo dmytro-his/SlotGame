@@ -40,7 +40,7 @@ namespace TestGameModel
             //Console.WriteLine(list.OrderByDescending(v => v.Mult).ThenBy(v => Guid.NewGuid()).ToList().First(v=>v.Check()).Mult);
             //return;
             int spinCount = 100000;
-            int cashCount = 100000;
+            int cashCount = 10000;
             Cash bet = new Cash(Currency.EUR, 100);
             Console.WriteLine($"SpinCount: {spinCount}");
             Console.WriteLine($"CashCount: {cashCount}");
