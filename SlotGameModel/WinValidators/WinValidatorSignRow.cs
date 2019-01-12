@@ -22,6 +22,9 @@
                     if (gameField[i, j] != _wantedSign)
                         goto nextRow;
 
+                for (int c = 0; c < gameField.ColumnsCount; c++)
+                    gameField.SignsWinStatus[i][c] = SignWinStatus.Win;
+
                 return true;
 
                 nextRow:;

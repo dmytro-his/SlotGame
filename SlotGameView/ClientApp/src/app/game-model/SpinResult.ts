@@ -1,5 +1,6 @@
 import { Cash } from "./Cash";
 import { SignName } from './SignName';
+import { SignWinStatus } from './SignWinStatus';
 
 export class SpinResult {
 
@@ -7,22 +8,22 @@ export class SpinResult {
     public multiplier: number;
     public profit: Cash;
     public gameField: SignName[][];
-    public winSignField: boolean[][];
+    public signsWinStatus: SignWinStatus[][];
 
     get isWin(): boolean {
-        return this.winSignField.some(w => w.some(v => v == true));
+        return this.signsWinStatus.some(w => w.some(v => v == SignWinStatus.Win));
     }
 
     constructor() {
         this.gameField = [];
-        this.winSignField = [];
+        this.signsWinStatus = [];
 
         for (var i = 0; i < 3; i++) {
             this.gameField[i] = [];
-            this.winSignField[i] = [];
+            this.signsWinStatus[i] = [];
             for (var j = 0; j < 5; j++) {
                 this.gameField[i][j] = SignName.HappyVip;
-                this.winSignField[i][j] = false;
+                this.signsWinStatus[i][j] = SignWinStatus.NotWin;
             }
         }
     }

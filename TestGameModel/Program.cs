@@ -8,37 +8,10 @@ using System.Threading.Tasks;
 
 namespace TestGameModel
 {
-    class Lol
-    {
-        public int Mult;
-
-        public Lol(int mult)
-        {
-            this.Mult = mult;
-        }
-        public bool Check()
-        {
-            return Mult == 5;
-        }
-    }
     class Program
     {
         static void Main(string[] args)
         {
-            
-            //List<Lol> list = new List<Lol>() {
-            //    new Lol(1),
-            //    new Lol(5),
-            //    new Lol(10),
-            //    new Lol(-5),
-            //    new Lol(3),
-            //    new Lol(2),
-            //    new Lol(6),
-            //    new Lol(1)
-            //};
-            //Console.WriteLine(list.OrderByDescending(v=>v.Mult).ThenBy(v=>Guid.NewGuid()).First(v=>v.Check()).Mult);
-            //Console.WriteLine(list.OrderByDescending(v => v.Mult).ThenBy(v => Guid.NewGuid()).ToList().First(v=>v.Check()).Mult);
-            //return;
             int spinCount = 100000;
             int cashCount = 10000;
             Cash bet = new Cash(Currency.EUR, 100);
@@ -46,26 +19,25 @@ namespace TestGameModel
             Console.WriteLine($"CashCount: {cashCount}");
             Console.WriteLine($"Bet: {bet}");
 
-            //Stopwatch watch = new Stopwatch();
-            //watch.Start();
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
 
-            //int taskCount = 100;
-            //Task<decimal>[] tasks = new Task<decimal>[taskCount];
-            //for (int t = 0; t < taskCount; t++)
-            //{
-            //    tasks[t] = Task<decimal>.Factory.StartNew(() => SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet));
-            //}
+            int taskCount = 10;
+            Task<decimal>[] tasks = new Task<decimal>[taskCount];
+            for (int t = 0; t < taskCount; t++)
+            {
+                tasks[t] = Task<decimal>.Factory.StartNew(() => SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet));
+            }
 
-            //Task.WaitAll(tasks);
-            //watch.Stop();
-            //Console.WriteLine("time: " + watch.ElapsedMilliseconds);
+            Task.WaitAll(tasks);
+            watch.Stop();
+            Console.WriteLine("time: " + watch.ElapsedMilliseconds);
 
-            //decimal[] results = tasks.Select(t => t.Result).ToArray();
-            //Console.WriteLine("Average: " + results.Average());
-            SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet);
+            decimal[] results = tasks.Select(t => t.Result).ToArray();
+            Console.WriteLine("Average: " + results.Average());
+            //SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet);
             Console.WriteLine("end");
             Console.ReadKey();
-            // list 108590
         }
 
         public static decimal SimulateGame(Cash cash, int spinCount, Cash bet)
@@ -85,7 +57,10 @@ namespace TestGameModel
                 if (game.Cash.Count < min)
                     min = game.Cash.Count;
 
-
+                //if(wintype.Win && game.GameField.SignsWinStatus.All(sw=>sw.All(sw2=>sw2==SignWinStatus.NotWin)))
+                //{
+                //    Console.WriteLine("LOL");
+                //}
                 winningInfo[wintype] = winningInfo.ContainsKey(wintype) ? winningInfo[wintype] + 1 : 1;
 
                 //if (game.Cash.Count < 0)
@@ -118,6 +93,7 @@ namespace TestGameModel
             Console.WriteLine($"Max: {max}");
             Console.WriteLine($"Min: {min}");
             Console.WriteLine($"Current: {game.Cash.Count}");
+            Console.WriteLine($"SpinsHistory: {game.HistoryOfSpins.Count}");
             return fullWin / (i * bet.Count);
         }
 

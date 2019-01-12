@@ -13,7 +13,7 @@ export class GameViewModel {
     private sessionId: string;
     public gameField: SignName[][];
     public cash: Cash;
-    private bet: Cash;
+    public bet: Cash;
     public lastSpinResult: SpinResult;
 
 
@@ -53,7 +53,7 @@ export class GameViewModel {
             this.lastSpinResult.gameField = serverData.gameField;
             this.lastSpinResult.multiplier = serverData.multiplier;
             this.lastSpinResult.profit = serverData.profit;
-            this.lastSpinResult.winSignField = [];
+            this.lastSpinResult.signsWinStatus = serverData.signsWinStatus;
         });
     }
 
@@ -72,7 +72,7 @@ export class GameViewModel {
             this.lastSpinResult.gameField = serverData.gameField;
             this.lastSpinResult.multiplier = serverData.multiplier;
             this.lastSpinResult.profit = serverData.profit;
-            this.lastSpinResult.winSignField = [];//
+            this.lastSpinResult.signsWinStatus = serverData.signsWinStatus;
             this.onSpinEvent.raise();
         });
     }

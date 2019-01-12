@@ -18,6 +18,10 @@
         public override bool CheckForWin(GameField gameField)
         {
             var tempResult = false;
+            var winStatusField = new SignWinStatus[gameField.RowsCount][];
+            for (int i = 0; i < gameField.RowsCount; i++)
+                winStatusField[i] = new SignWinStatus[gameField.ColumnsCount];
+
             for (int i = 0; i < _countColumn; i++)
             {
                 tempResult = false;
@@ -25,11 +29,13 @@
                     if (gameField[j, i] == _wantedSign)
                     {
                         tempResult = true;
+                        winStatusField[j][i] = SignWinStatus.Win;
                         break;
                     }
                 if (tempResult == false)
                     return false;
             }
+            gameField.SignsWinStatus = winStatusField;
             return true;
         }
     }

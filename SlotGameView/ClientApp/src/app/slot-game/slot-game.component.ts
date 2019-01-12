@@ -5,6 +5,8 @@ import { GameResponseOK } from '../game-model/GameResponseOK';
 import { Cash } from '../game-model/Cash';
 import { GameViewModel } from '../game-model/ViewModels/GameViewModel';
 import { Currency } from '../game-model/Currency';
+import { AnimationJsonService } from '../animation-json.service';
+import { SignWinStatus } from '../game-model/SignWinStatus';
 
 /// <reference path="node_modules/pixi-particles/ambient.d.ts" />
 require('pixi-particles');
@@ -20,7 +22,7 @@ declare var require: any
   selector: 'app-slot-game',
   templateUrl: './slot-game.component.html',
   styleUrls: ['./slot-game.component.css'],
-  providers: [SlotGameService]
+  providers: [SlotGameService, AnimationJsonService]
 })
 export class SlotGameComponent implements OnInit {
 
@@ -31,8 +33,8 @@ export class SlotGameComponent implements OnInit {
   /**
    *
    */
-  constructor(private service: SlotGameService) {
-    
+  constructor(private service: SlotGameService, private settingsService: AnimationJsonService) {
+
     this.gameViewModel = new GameViewModel(service);
   }
   ngOnInit() {
@@ -83,11 +85,13 @@ export class SlotGameComponent implements OnInit {
     var reels = [];
     var running = false;
     var tweening = [];
+    var winSign = [];
 
-    // this.gameViewModel.onInitEvent.subscribe(updateGameField);
+    var filter = new PIXI.filters.ColorMatrixFilter();
     this.gameViewModel.onSpinEvent.subscribe(updateGameField.bind(this));
 
     function updateGameField() {
+      winSign = [];
       for (var i = 0; i < reels.length; i++) {
         var lengreel = reels[i].symbols.length;
         var position = reels[i].position % lengreel - 1 < 0 ? lengreel - 1 : reels[i].position % lengreel - 1;
@@ -97,13 +101,20 @@ export class SlotGameComponent implements OnInit {
 
         for (var currentGenerateIndex = 0; currentGenerateIndex < countToGenerate; currentGenerateIndex++) {
           var s = reels[i].symbols[position - currentGenerateIndex];
-
           if (currentGenerateIndex < countToGenerate - 4 || currentGenerateIndex == countToGenerate - 1)
             s.texture = slotTextures[Math.floor(Math.random() * slotTextures.length)];
-          else
+          else {
             s.texture = slotTextures[this.gameViewModel.gameField[countToGenerate - currentGenerateIndex - 2][i]];
+            if (this.gameViewModel.lastSpinResult.signsWinStatus[countToGenerate - currentGenerateIndex - 2][i] == SignWinStatus.Win) {
+              winSign.push(s);
+              s.filters = [filter]
+            }
+          }
 
           s.scale.x = s.scale.y = Math.min(SYMBOL_SIZE / s.texture.width, SYMBOL_SIZE / s.texture.height);
+
+          s.beginScale.x = s.scale.x;
+          s.beginScale.y = s.scale.y;
           s.x = Math.round((SYMBOL_SIZE - s.width) / 2);
         }
       }
@@ -116,12 +127,12 @@ export class SlotGameComponent implements OnInit {
       function reelsComplete() {
         tweening = [];
         running = false;
+        // this.gameViewModel.cash = 
       }
 
     }
     //onAssetsLoaded handler builds the example.
     function onAssetsLoaded() {
-
       //Create different slot symbols.
       slotTextures = [
         PIXI.Texture.fromImage("assets/signs/SymH.png"),
@@ -133,8 +144,7 @@ export class SlotGameComponent implements OnInit {
         PIXI.Texture.fromImage("assets/signs/HappyVip.png")
       ];
 
-
-      var bgImages = [
+      var bgTextures = [
         PIXI.Texture.fromFrame('backGroungImage0'),
         PIXI.Texture.fromFrame('backGroungImage1'),
         PIXI.Texture.fromFrame('backGroungImage2'),
@@ -144,10 +154,9 @@ export class SlotGameComponent implements OnInit {
         PIXI.Texture.fromFrame('backGroungImage6')
       ];
       var backStage = PIXI.Sprite.fromImage('');
-      backStage.texture = bgImages[0];
+      backStage.texture = bgTextures[0];
 
       app.stage.addChild(backStage);
-
 
       //Build the reels
       var reelContainer = new PIXI.Container();
@@ -180,6 +189,9 @@ export class SlotGameComponent implements OnInit {
           //Scale the symbol to fit symbol area.
           symbol.y = j * SYMBOL_SIZE - SYMBOL_SIZE;
           symbol.scale.x = symbol.scale.y = Math.min(SYMBOL_SIZE / symbol.width, SYMBOL_SIZE / symbol.height);
+          symbol.beginScale = {};
+          symbol.beginScale.x = symbol.scale.x;
+          symbol.beginScale.y = symbol.scale.y;
           symbol.x = Math.round((SYMBOL_SIZE - symbol.width) / 2);
           reel.symbols.push(symbol);
           rc.addChild(symbol);
@@ -238,8 +250,8 @@ export class SlotGameComponent implements OnInit {
       betInfo.addChild(betText);
       betInfo.interactive = true;
       betInfo.on('pointerdown', () => {
-        var index = bgImages.indexOf(backStage.texture) + 1 == bgImages.length ? 0 : bgImages.indexOf(backStage.texture) + 1;
-        backStage.texture = bgImages[index];
+        var index = bgTextures.indexOf(backStage.texture) + 1 == bgTextures.length ? 0 : bgTextures.indexOf(backStage.texture) + 1;
+        backStage.texture = bgTextures[index];
       })
         .on('pointerover', () => betInfo.alpha = 0.8)
         .on('pointerout', () => betInfo.alpha = 1);
@@ -294,9 +306,13 @@ export class SlotGameComponent implements OnInit {
       spinButton.interactive = true;
 
       spinButton.on('pointerdown', () => {
-       if (running) return;
+        if (running) {
+          tweening.forEach(t => t.isHurry = true);
+          return;
+        }
 
         running = true;
+        // this.gameViewModel.cash -= this.gameViewModel.bet;//just for animation. but also all doing at server side
         console.log(this.gameViewModel);
         this.gameViewModel.Spin();
       })
@@ -305,6 +321,7 @@ export class SlotGameComponent implements OnInit {
 
       app.stage.addChild(spinButton);
 
+      // console.log(this.gameViewModel.cash);
 
 
       var cashInfo = PIXI.Sprite.fromImage('assets/buttons/rock.png');
@@ -323,262 +340,28 @@ export class SlotGameComponent implements OnInit {
       app.stage.addChild(cashInfo);
 
       this.gameViewModel.cash.onChangeEvent.subscribe(() => cashText.text = `Cash:\n${this.gameViewModel.cash.count}`);
+      // var updateCash = () => cashText.text = `Cash:\n${this.gameViewModel.cash.count}`;
+
       var frontStage = PIXI.Sprite.fromImage('');
       app.stage.addChild(frontStage);
       // Create a new emitter
       // addEmmiterOn(bg);
       var snowFlake = PIXI.Texture.fromImage('assets/bg/snowFlake.png');
+
+      this.settingsService.getBackSmokeJSON().subscribe((data) => {
+        addEmmiter(backStage, [PIXI.Texture.fromImage('assets/bg/smoke.png')], data);
+      });
       // snowFlake.scale.x
-      addEmmiter(backStage, [PIXI.Texture.fromImage('assets/bg/smoke.png')], {
-        "alpha": {
-          "start": 0.1,
-          "end": 0.1
-        },
-        "scale": {
-          "start": 0.15,
-          "end": 0.2,
-          "minimumScaleMultiplier": 0.5
-        },
-        "color": {
-          "start": "ffffff",
-          "end": "ffffff"
-        },
-        "speed": {
-          "start": -100,
-          "end": -100
-        },
-        "startRotation": {
-          "min": 50,
-          "max": 100
-        },
-        "rotationSpeed": {
-          "min": 0,
-          "max": 0
-        },
-        "lifetime": {
-          "min": 10,
-          "max": 10
-        },
-        "blendMode": "normal",
-        "ease": [
-          {
-            "s": 0,
-            "cp": 0.379,
-            "e": 0.548
-          },
-          {
-            "s": 0.548,
-            "cp": 0.717,
-            "e": 0.676
-          },
-          {
-            "s": 0.676,
-            "cp": 0.635,
-            "e": 1
-          }
-        ],
-        "frequency": 0.01,
-        "emitterLifetime": 0,
-        "maxParticles": 1000,
-        "pos": {
-          "x": 500,
-          "y": 50
-        },
-        "addAtBack": false,
-        "spawnType": "rect",
-        "spawnRect": {
-          "x": -500,
-          "y": 1000,
-          "w": 1800,
-          "h": 20
-        }
+      this.settingsService.getBackSnowJSON().subscribe((data) => {
+        addEmmiter(backStage, [snowFlake], data);
+      });
+      this.settingsService.getFrontSnowJSON().subscribe((data) => {
+        addEmmiter(frontStage, [snowFlake], data);
       });
 
-      addEmmiter(backStage, [snowFlake], {
-        "alpha": {
-          "start": 0.73,
-          "end": 0.46
-        },
-        "scale": {
-          "start": 0.05,
-          "end": 0.1,
-          "minimumScaleMultiplier": 0.1
-        },
-        "color": {
-          "start": "ffffff",
-          "end": "ffffff"
-        },
-        "speed": {
-          "start": 30,
-          "end": 30
-        },
-        "startRotation": {
-          "min": 50,
-          "max": 100
-        },
-        "rotationSpeed": {
-          "min": 0,
-          "max": 0
-        },
-        "lifetime": {
-          "min": 20,
-          "max": 20
-        },
-        "blendMode": "normal",
-        "ease": [
-          {
-            "s": 0,
-            "cp": 0.379,
-            "e": 0.548
-          },
-          {
-            "s": 0.548,
-            "cp": 0.717,
-            "e": 0.676
-          },
-          {
-            "s": 0.676,
-            "cp": 0.635,
-            "e": 1
-          }
-        ],
-        "frequency": 0.1,
-        "emitterLifetime": 0,
-        "maxParticles": 1000,
-        "pos": {
-          "x": 500,
-          "y": 50
-        },
-        "addAtBack": true,
-        "spawnType": "rect",
-        "spawnRect": {
-          "x": -500,
-          "y": -100,
-          "w": 1800,
-          "h": 20
-        }
+      this.settingsService.getBackFireJSON().subscribe((data) => {
+        addEmmiter(backStage, [PIXI.Texture.fromImage('assets/bg/particle.png'), PIXI.Texture.fromImage('assets/bg/fire.png')], data);
       });
-
-
-      addEmmiter(frontStage, [snowFlake], {
-        "alpha": {
-          "start": 0.73,
-          "end": 0.46
-        },
-        "scale": {
-          "start": 0.15,
-          "end": 0.2,
-          "minimumScaleMultiplier": 0.1
-        },
-        "color": {
-          "start": "ffffff",
-          "end": "ffffff"
-        },
-        "speed": {
-          "start": 70,
-          "end": 70
-        },
-        "startRotation": {
-          "min": 50,
-          "max": 100
-        },
-        "rotationSpeed": {
-          "min": 0,
-          "max": 0
-        },
-        "lifetime": {
-          "min": 10,
-          "max": 10
-        },
-        "blendMode": "normal",
-        "ease": [
-          {
-            "s": 0,
-            "cp": 0.379,
-            "e": 0.548
-          },
-          {
-            "s": 0.548,
-            "cp": 0.717,
-            "e": 0.676
-          },
-          {
-            "s": 0.676,
-            "cp": 0.635,
-            "e": 1
-          }
-        ],
-        "frequency": 0.1,
-        "emitterLifetime": 0,
-        "maxParticles": 1000,
-        "pos": {
-          "x": 500,
-          "y": 50
-        },
-        "addAtBack": true,
-        "spawnType": "rect",
-        "spawnRect": {
-          "x": -500,
-          "y": -100,
-          "w": 1800,
-          "h": 20
-        }
-      });
-
-
-      addEmmiter(backStage, [PIXI.Texture.fromImage('assets/bg/particle.png'), PIXI.Texture.fromImage('assets/bg/fire.png')],
-        {
-          "alpha": {
-            "start": 0.62,
-            "end": 0
-          },
-          "scale": {
-            "start": 0.25,
-            "end": 0.75
-          },
-          "color": {
-            //this list is turned into a 5 step gradient inside ParticleExample with
-            //PIXI.particles.createSteppedGradient() after the emitter is created
-            "list": [
-              { "value": "fff191", "time": 0 },
-              { "value": "ff622c", "time": 1 }
-            ],
-            "isStepped": false
-          },
-          "speed": {
-            "start": 50,
-            "end": 50
-          },
-          "startRotation": {
-            "min": 265,
-            "max": 275
-          },
-          "rotationSpeed": {
-            "min": 50,
-            "max": 50
-          },
-          "lifetime": {
-            "min": 0.5,
-            "max": 1.3
-          },
-          "blendMode": "normal",
-          "frequency": 0.001,
-          "emitterLifetime": 0,
-          "maxParticles": 500,
-          "pos": {
-            "x": 0,
-            "y": 0
-          },
-          "addAtBack": false,
-          "spawnType": "rect",
-          "spawnRect": {
-            "x": 0,
-            "y": 750,
-            "w": 2000,
-            "h": 20
-          }
-        });
-
 
       function addEmmiter(container, sprites, settings) {
         var emitter = new PIXI.particles.Emitter(
@@ -633,7 +416,8 @@ export class SlotGameComponent implements OnInit {
         time: time,
         change: onchange,
         complete: oncomplete,
-        start: Date.now()
+        start: Date.now(),
+        isHurry: false
       };
 
       tweening.push(tween);
@@ -643,13 +427,21 @@ export class SlotGameComponent implements OnInit {
 
 
 
+    // var filter =new PIXI.Filter(null, 10);
 
+    // winSign.forEach(ws => {
+
+    //   ws.filters=[filter];
+    // });
     //#region  animation functions 
-    app.ticker.add(function () {
+    var count = 0;
+filter.brightness(0.1,true);
+    app.ticker.add(function (delta) {
 
       var now = Date.now();
       tweening.forEach((t, i) => {
-        var phase = Math.min(1, (now - t.start) / t.time);
+
+        var phase = t.isHurry ? 1 : Math.min(1, (now - t.start) / t.time);
 
         t.object[t.property] = lerp(t.propertyBeginValue, t.target, t.easing(phase));
         // if (t.change) t.change(t);

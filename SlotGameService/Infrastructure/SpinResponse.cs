@@ -14,6 +14,7 @@ namespace SlotGameService.Infrastructure
         public Cash Cash;
         public decimal Multiplier;
         public SignName[][] GameField;
+        public SignWinStatus[][] SignsWinStatus;
 
         public SpinResponse(Guid sessionId)
             : base(sessionId, StatusResponse.OK)

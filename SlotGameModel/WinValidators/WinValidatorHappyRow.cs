@@ -4,10 +4,10 @@
     //      |H  A   P   P   Y |
     //      |                 |
     //      |                 |
-    
+
     class WinValidatorHappyRow : WinValidator
     {
-        
+
         public WinValidatorHappyRow(decimal multiplier) : base("HappyRow", multiplier)
         {
         }
@@ -21,7 +21,14 @@
                     gameField[i, 2] == SignName.HappyCharP &&
                     gameField[i, 3] == SignName.HappyCharP &&
                     gameField[i, 4] == SignName.HappyCharY)
+                {
+                    gameField.SignsWinStatus[i][0] = SignWinStatus.Win;
+                    gameField.SignsWinStatus[i][1] = SignWinStatus.Win;
+                    gameField.SignsWinStatus[i][2] = SignWinStatus.Win;
+                    gameField.SignsWinStatus[i][3] = SignWinStatus.Win;
+                    gameField.SignsWinStatus[i][4] = SignWinStatus.Win;
                     return true;
+                }
             }
             return false;
         }

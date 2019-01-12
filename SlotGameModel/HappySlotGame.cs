@@ -15,6 +15,7 @@ namespace SlotGame.Model
 
         private static WinValidatorsCollection WinValidators;
 
+        public List<WinResponse> HistoryOfSpins = new List<WinResponse>();
         static HappySlotGame()
         {
             WinValidators = new WinValidatorsCollection();
@@ -89,7 +90,9 @@ namespace SlotGame.Model
 
             Cash.Count += bet.Count * winValidator.Multiplier;
 
-            return new WinResponse(winValidator.Name, bet, winValidator.Multiplier);
+            var winResponse = new WinResponse(winValidator.Name, bet, winValidator.Multiplier);
+            HistoryOfSpins.Add(winResponse);
+            return winResponse;
         }
 
     }

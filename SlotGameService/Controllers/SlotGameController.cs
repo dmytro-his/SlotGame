@@ -35,6 +35,7 @@ namespace SlotGameService.Controllers
                 Bet = new Cash(),
                 Cash = game.Cash,
                 IsWin = false,
+                SignsWinStatus=game.GameField.SignsWinStatus,
                 Multiplier = 0,
                 Profit = new Cash(),
                 GameField = (SignName[][])game.GameField
@@ -64,6 +65,7 @@ namespace SlotGameService.Controllers
                 Bet = winResponse.Bet,
                 Cash = game.Cash,
                 IsWin = winResponse.Win,
+                SignsWinStatus = game.GameField.SignsWinStatus,
                 Multiplier = winResponse.Multiplier,
                 Profit = winResponse.Profit,
                 GameField = (SignName[][])game.GameField

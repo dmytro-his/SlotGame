@@ -1,7 +1,10 @@
-﻿namespace SlotGame.Model
+﻿using System;
+
+namespace SlotGame.Model
 {
     public class WinResponse
     {
+        public readonly DateTime DateTime;
         public string Name;
         public decimal Multiplier { get; }
         public Cash Bet { get; }
@@ -10,6 +13,7 @@
 
         public WinResponse(string name, Cash bet, decimal multiplier)
         {
+            this.DateTime = DateTime.Now;
             this.Name = name;
             this.Bet = bet;
             this.Multiplier = multiplier;
