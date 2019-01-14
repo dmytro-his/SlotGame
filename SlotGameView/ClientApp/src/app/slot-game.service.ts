@@ -4,25 +4,44 @@ import { map } from "rxjs/operators";
 import { Observable } from 'rxjs';
 import { GameResponseBase } from './game-model/GameResponseBase';
 import { GameResponseOK } from './game-model/GameResponseOK';
-// import { Guid } from 'guid-typescript';
-import { ISlotGameService } from './ISlotGameService';
 
 @Injectable({
   providedIn: 'root'
 })
-export class SlotGameService implements ISlotGameService{
+export class SlotGameService {
+
+  private _gameSessionId: string = null;
+
+  get gameSessionId() {
+    if (this._gameSessionId == null)
+      throw new Error('First init');
+
+    return this._gameSessionId;
+  }
 
   constructor(private http: HttpClient) { }
 
   Init(): Observable<GameResponseOK> {
-    return this.http.get<any>('http://localhost:52886/slotGame/init');
+    if (this._gameSessionId != null)
+      return this.GetCurrentState();
+
+    var response = this.http.get<any>('http://localhost:52886/slotGame/init');
+    response.subscribe((data) => this._gameSessionId = data.sessionId)
+    return response;
   }
 
-  Spin(sessionId: string, bet: number): Observable<GameResponseOK> {
+  private GetCurrentState(): Observable<GameResponseOK> {
 
-    const params = new HttpParams().set('sessionId', sessionId)
+    const params = new HttpParams().set('sessionId', this._gameSessionId);
+
+    return this.http.get<any>('http://localhost:52886/slotGame/GetCurrentState', { params });
+  }
+
+  Spin(bet: number): Observable<GameResponseOK> {
+
+    const params = new HttpParams().set('sessionId', this._gameSessionId)
       .set('bet', bet.toString());
-      
+
     return this.http.get<any>('http://localhost:52886/slotGame/spin', { params });
 
   }

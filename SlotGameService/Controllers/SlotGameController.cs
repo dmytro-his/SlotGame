@@ -19,7 +19,6 @@ namespace SlotGameService.Controllers
         public SlotGameController(IHappySlotsRepository repository)
         {
             this._repository = repository;
-
         }
         //[Route("init")]
         public Response Init()
@@ -35,7 +34,7 @@ namespace SlotGameService.Controllers
                 Bet = new Cash(),
                 Cash = game.Cash,
                 IsWin = false,
-                SignsWinStatus=game.GameField.SignsWinStatus,
+                SignsWinStatus = game.GameField.SignsWinStatus,
                 Multiplier = 0,
                 Profit = new Cash(),
                 GameField = (SignName[][])game.GameField
@@ -59,6 +58,28 @@ namespace SlotGameService.Controllers
                 return new ErrorResponse(sessionId == null ? Guid.Empty : sessionId, new NullReferenceException("You are not initialize"));
 
             var winResponse = game.Spin(betCash);
+
+            return new SpinResponse(sessionId)
+            {
+                Bet = winResponse.Bet,
+                Cash = game.Cash,
+                IsWin = winResponse.Win,
+                SignsWinStatus = game.GameField.SignsWinStatus,
+                Multiplier = winResponse.Multiplier,
+                Profit = winResponse.Profit,
+                GameField = (SignName[][])game.GameField
+            };
+        }
+
+
+        public Response GetCurrentState([BindRequired, FromQuery]Guid sessionId)
+        {
+            var game = this._repository.GetGame(sessionId);
+
+            if (game == null)
+                return new ErrorResponse(sessionId == null ? Guid.Empty : sessionId, new NullReferenceException("You are not initialize"));
+
+            var winResponse = game.HistoryOfSpins.Last();
 
             return new SpinResponse(sessionId)
             {

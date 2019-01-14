@@ -68,7 +68,15 @@ namespace SlotGame.Model
 
             this.Cash = cash;
 
-            while (this.Spin().Win) ; // spin while win without bet
+            while (true)
+            {
+                var winResponse = this.Spin();
+                if (!winResponse.Win)
+                {
+                    HistoryOfSpins.Add(winResponse);
+                    break;
+                }
+            }; // spin while win without bet
         }
 
         private WinResponse Spin()

@@ -1,11 +1,12 @@
-import { GameResponseOK } from "../GameResponseOK";
-import { ISlotGameService } from '../../ISlotGameService';
 import { Cash } from '../Cash';
 import { SpinResult } from '../SpinResult';
 import { SignName } from '../SignName';
 import { LiteEvent } from '../Infrastructure/LiteEvent';
 import { StatusResponse } from '../StatusResponse';
 import { Currency } from '../Currency';
+import { SlotGameService } from 'src/app/slot-game.service';
+import { GameResponseOK } from '../GameResponseOK';
+import { Observable } from 'rxjs';
 
 
 export class GameViewModel {
@@ -19,7 +20,7 @@ export class GameViewModel {
 
     public onSpinEvent: LiteEvent<void>;
 
-    constructor(private service: ISlotGameService) {
+    constructor(private service: SlotGameService) {
 
         this.lastSpinResult = new SpinResult();
         this.bet = new Cash();
@@ -34,11 +35,11 @@ export class GameViewModel {
             }
         }
         this.onSpinEvent = new LiteEvent<void>();
-        this.Init();
     }
 
-    public Init(): void {
-        this.service.Init().subscribe(serverData => {
+    public Init(callback): void {
+        var response = this.service.Init();
+        response.subscribe(serverData => {
 
             if (serverData.statusResponse != StatusResponse.OK)
                 return;
@@ -46,27 +47,31 @@ export class GameViewModel {
 
             this.gameField = serverData.gameField;
             this.cash = new Cash();
-            this.cash.count=serverData.cash.count;
-            this.cash.currency=serverData.cash.currency;
+            this.cash.count = serverData.cash.count;
+            this.cash.currency = serverData.cash.currency;
 
             this.lastSpinResult.bet = serverData.bet;
             this.lastSpinResult.gameField = serverData.gameField;
             this.lastSpinResult.multiplier = serverData.multiplier;
             this.lastSpinResult.profit = serverData.profit;
             this.lastSpinResult.signsWinStatus = serverData.signsWinStatus;
+            callback();
         });
     }
 
     public Spin(): void {
 
-        this.service.Spin(this.sessionId, this.bet.count).subscribe(serverData => {
+        this.service.Spin(this.bet.count).subscribe(serverData => {
 
             if (serverData.statusResponse != StatusResponse.OK)
                 return;
 
             this.gameField = serverData.gameField;
-            this.cash.count=serverData.cash.count;
-            this.cash.currency=serverData.cash.currency;
+
+            this.bet.count = serverData.bet.count;
+            this.bet.currency = serverData.bet.currency;
+            this.cash.count = serverData.cash.count;
+            this.cash.currency = serverData.cash.currency;
 
             this.lastSpinResult.bet = serverData.bet;
             this.lastSpinResult.gameField = serverData.gameField;
