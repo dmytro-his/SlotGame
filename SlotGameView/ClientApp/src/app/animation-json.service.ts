@@ -12,7 +12,6 @@ export class AnimationJsonService {
   backFireURL: string = '/assets/animationSettings/backFire.json';
   backSmokeURL: string = '/assets/animationSettings/backSmoke.json';
 
-
   constructor(private http: HttpClient) {
   }
 

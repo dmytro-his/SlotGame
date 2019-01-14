@@ -51,6 +51,7 @@ export class Loader {
         this._assetLoader.load();
     }
     _onImagesLoaded() {
+        console.log('onloadeeed');
         this._callback();
     }
 }

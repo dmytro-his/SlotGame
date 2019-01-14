@@ -27,7 +27,7 @@ import { SlotGameService } from './slot-game.service';
     MatIconModule,
     BrowserAnimationsModule
   ],
-  providers: [], // why . .. 
+  providers: [AnimationJsonService, SlotGameService], // why . .. 
   bootstrap: [AppComponent]
 })
 export class AppModule { }
