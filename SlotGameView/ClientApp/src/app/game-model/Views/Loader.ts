@@ -3,10 +3,8 @@ import { forEach } from '@angular/router/src/utils/collection';
 declare var PIXI: any;
 
 export class Loader {
-    private _callback: any;
     private _assetLoader: any;
     constructor() {
-        this._callback = null;
         this._assetLoader = PIXI.loader;
         var resources: { [id: string]: string; } = {}
         resources['assets/signs/SymH.png'] = 'assets/signs/SymH.png';
@@ -38,20 +36,17 @@ export class Loader {
         resources['assets/bg/fire.png'] = 'assets/bg/fire.png';
         resources['assets/bg/particle.png'] = 'assets/bg/particle.png';
 
+        resources['frontSwowingJSON'] = '/assets/animationSettings/frontSwowing.json';
+        resources['backSwowingJSON'] = '/assets/animationSettings/backSwowing.json';
+        resources['backSmokeJSON'] = '/assets/animationSettings/backSmoke.json';
+
         for (var key in resources) {
-            if(this._assetLoader.resources[key])
+            if (this._assetLoader.resources[key])
                 continue;
             this._assetLoader.add(key, resources[key]);
         }
-        this._assetLoader
-            .once('complete', this._onImagesLoaded.bind(this));
     }
     load(callback) {
-        this._callback = callback;
-        this._assetLoader.load();
-    }
-    _onImagesLoaded() {
-        console.log('onloadeeed');
-        this._callback();
+        this._assetLoader.load(callback);
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using SlotGame.Model;
@@ -11,7 +12,7 @@ using SlotGameService.Models;
 
 namespace SlotGameService.Controllers
 {
-    //[Route("api/[controller]")]
+    //[EnableCors()]
     public class SlotGameController : Controller
     {
         readonly IHappySlotsRepository _repository;
@@ -20,7 +21,7 @@ namespace SlotGameService.Controllers
         {
             this._repository = repository;
         }
-        //[Route("init")]
+
         public Response Init()
         {
             HappySlotGame game = null;
@@ -45,10 +46,9 @@ namespace SlotGameService.Controllers
             //     return new ErrorResponse(game?.Guid ?? Guid.Empty, e);
             // }
         }
-
-        //[Route("spin/")]
-        //[HttpGet]
-        public Response Spin([BindRequired, FromQuery]Guid sessionId, [BindRequired, FromQuery]decimal bet)
+        
+        //[HttpPost]
+        public Response Spin(Guid sessionId, decimal bet)
         {
             var game = this._repository.GetGame(sessionId);
 
@@ -57,18 +57,35 @@ namespace SlotGameService.Controllers
             if (game == null)
                 return new ErrorResponse(sessionId == null ? Guid.Empty : sessionId, new NullReferenceException("You are not initialize"));
 
-            var winResponse = game.Spin(betCash);
-
-            return new SpinResponse(sessionId)
+            try
             {
-                Bet = winResponse.Bet,
-                Cash = game.Cash,
-                IsWin = winResponse.Win,
-                SignsWinStatus = game.GameField.SignsWinStatus,
-                Multiplier = winResponse.Multiplier,
-                Profit = winResponse.Profit,
-                GameField = (SignName[][])game.GameField
-            };
+                var winResponse = game.Spin(betCash);
+
+                return new SpinResponse(sessionId)
+                {
+                    Bet = winResponse.Bet,
+                    Cash = game.Cash,
+                    IsWin = winResponse.Win,
+                    SignsWinStatus = game.GameField.SignsWinStatus,
+                    Multiplier = winResponse.Multiplier,
+                    Profit = winResponse.Profit,
+                    GameField = (SignName[][])game.GameField
+                };
+            }
+            catch(GameException e)
+            {
+                return new SpinResponse(sessionId)
+                {
+                    Bet =betCash,
+                    Cash = game.Cash,
+                    IsWin = false,
+                    SignsWinStatus = game.GameField.SignsWinStatus,
+                    Multiplier = 0,
+                    Profit = new Cash(),
+                    GameField = (SignName[][])game.GameField
+                };
+            }
+
         }
 
 

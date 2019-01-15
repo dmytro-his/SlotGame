@@ -15,6 +15,9 @@ namespace SlotGame.Model
 
         private static WinValidatorsCollection WinValidators;
 
+        private static readonly Cash MaxAwaibleBet = new Cash(Currency.USD, 1000);
+        private static readonly Cash MinAwaibleBet = new Cash(Currency.USD, 100);
+
         public List<WinResponse> HistoryOfSpins = new List<WinResponse>();
         static HappySlotGame()
         {
@@ -91,12 +94,18 @@ namespace SlotGame.Model
 
         public WinResponse Spin(Cash bet)
         {
+            if (bet.Count > Cash.Count)
+                throw new NotEnoughMoneyException(); 
+            if(bet.Count<MinAwaibleBet.Count || bet.Count>MaxAwaibleBet.Count)
+                throw new NotAwaibleBetException();
+
             Cash.Count -= bet.Count;
             GameField.GenerateSigns();
 
             var winValidator = WinValidators.CheckWin(GameField);
 
             Cash.Count += bet.Count * winValidator.Multiplier;
+
 
             var winResponse = new WinResponse(winValidator.Name, bet, winValidator.Multiplier);
             HistoryOfSpins.Add(winResponse);

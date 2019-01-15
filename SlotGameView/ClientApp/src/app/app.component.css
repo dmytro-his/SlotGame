@@ -1,8 +1,8 @@
 
-  .active {color:purple;}
+  .active {color:white;}
   
   .mat-toolbar {
-    background: #212121;
+    background: transparent;
   }
   
   .spacer {

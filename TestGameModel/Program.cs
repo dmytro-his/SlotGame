@@ -12,30 +12,30 @@ namespace TestGameModel
     {
         static void Main(string[] args)
         {
-            int spinCount = 100000;
+            int spinCount = 50;
             int cashCount = 10000;
-            Cash bet = new Cash(Currency.EUR, 100);
+            Cash bet = new Cash(Currency.EUR, 1000);
             Console.WriteLine($"SpinCount: {spinCount}");
             Console.WriteLine($"CashCount: {cashCount}");
             Console.WriteLine($"Bet: {bet}");
 
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
+            //Stopwatch watch = new Stopwatch();
+            //watch.Start();
 
-            int taskCount = 10;
-            Task<decimal>[] tasks = new Task<decimal>[taskCount];
-            for (int t = 0; t < taskCount; t++)
-            {
-                tasks[t] = Task<decimal>.Factory.StartNew(() => SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet));
-            }
+            //int taskCount = 10;
+            //Task<decimal>[] tasks = new Task<decimal>[taskCount];
+            //for (int t = 0; t < taskCount; t++)
+            //{
+            //    tasks[t] = Task<decimal>.Factory.StartNew(() => SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet));
+            //}
 
-            Task.WaitAll(tasks);
-            watch.Stop();
-            Console.WriteLine("time: " + watch.ElapsedMilliseconds);
+            //Task.WaitAll(tasks);
+            //watch.Stop();
+            //Console.WriteLine("time: " + watch.ElapsedMilliseconds);
 
-            decimal[] results = tasks.Select(t => t.Result).ToArray();
-            Console.WriteLine("Average: " + results.Average());
-            //SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet);
+            //decimal[] results = tasks.Select(t => t.Result).ToArray();
+            //Console.WriteLine("Average: " + results.Average());
+            SimulateGame(new Cash(Currency.EUR, cashCount), spinCount, bet);
             Console.WriteLine("end");
             Console.ReadKey();
         }
@@ -66,8 +66,8 @@ namespace TestGameModel
                 //if (game.Cash.Count < 0)
                 //    break;
 
-                if (i % (spinCount / 100) == 0)
-                    Console.WriteLine(i / (spinCount / 100));
+                //if (i % (spinCount / 100) == 0)
+                //    Console.WriteLine(i / (spinCount / 100));
             }
 
             string resultInfo = String.Empty;

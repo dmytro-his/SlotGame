@@ -14,7 +14,18 @@ export class GameViewModel {
     private sessionId: string;
     public gameField: SignName[][];
     public cash: Cash;
-    public bet: Cash;
+    private _bet: Cash;
+    public get bet() {
+        return this._bet;
+    }
+    public set bet(newBet: Cash) {
+
+        if (newBet.count < 100 || newBet.count > 1000)
+            return;
+        this._bet = newBet;
+        this.onBetChangedEvent.raise();
+    }
+    public onBetChangedEvent: LiteEvent<void> = new LiteEvent<void>();
     public lastSpinResult: SpinResult;
 
 
@@ -23,9 +34,9 @@ export class GameViewModel {
     constructor(private service: SlotGameService) {
 
         this.lastSpinResult = new SpinResult();
-        this.bet = new Cash();
-        this.bet.count = 100;
-        this.bet.currency = Currency.USD;
+        this._bet = new Cash();
+        this._bet.count = 100;
+        this._bet.currency = Currency.USD;
 
         this.gameField = [];
         for (var i = 0; i < 3; i++) {
@@ -38,7 +49,9 @@ export class GameViewModel {
     }
 
     public Init(callback): void {
+
         var response = this.service.Init();
+
         response.subscribe(serverData => {
 
             if (serverData.statusResponse != StatusResponse.OK)
@@ -57,19 +70,20 @@ export class GameViewModel {
             this.lastSpinResult.signsWinStatus = serverData.signsWinStatus;
             callback();
         });
+
     }
 
     public Spin(): void {
 
-        this.service.Spin(this.bet.count).subscribe(serverData => {
+        this.service.Spin(this._bet.count).subscribe(serverData => {
 
             if (serverData.statusResponse != StatusResponse.OK)
                 return;
 
             this.gameField = serverData.gameField;
 
-            this.bet.count = serverData.bet.count;
-            this.bet.currency = serverData.bet.currency;
+            this._bet.count = serverData.bet.count;
+            this._bet.currency = serverData.bet.currency;
             this.cash.count = serverData.cash.count;
             this.cash.currency = serverData.cash.currency;
 

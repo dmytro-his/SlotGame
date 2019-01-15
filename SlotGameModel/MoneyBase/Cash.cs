@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace SlotGame.Model
 {
-    public class Cash
+    public class Cash 
     {
         public decimal Count { get; set; }
         public readonly Currency Currency;

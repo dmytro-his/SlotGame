@@ -1,24 +1,12 @@
-<!-- <div>
-  <nav>
-    <a routerLink="" [routerLinkActiveOptions]="{exact:true}" routerLinkActive="active">Slot Game</a>
-    <a routerLink="/DashBoard" routerLinkActive="active">DashBoard</a>
-  </nav>
-  <button mat-button [matMenuTriggerFor]="menu">Menu</button>
-<mat-menu #menu="matMenu">
-  <button mat-menu-item>Item 1</button>
-  <button mat-menu-item>Item 2</button>
-</mat-menu>
-  
-  <router-outlet></router-outlet>
-</div> -->
-
 <mat-toolbar color="primary">
-  <a class="logo" routerLink="" 
-  [routerLinkActiveOptions]="{exact:true}" 
-  routerLinkActive="active">BeHappyGaming</a>
+  <a class="logo" routerLink="" [routerLinkActiveOptions]="{exact:true}" routerLinkActive="active" style="-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;-o-user-select:none;"
+    unselectable="on" onselectstart="return false;" onmousedown="return false;">BeHappyGaming</a>
+
   <span class="spacer"></span>
-  <a mat-button routerLink="DashBoard" 
-  routerLinkActive="active">DashBoard</a>
+
+  <a mat-button routerLink="DashBoard" routerLinkActive="active">
+    <mat-icon>equalizer</mat-icon>
+  </a>
 </mat-toolbar>
 
 

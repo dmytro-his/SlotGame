@@ -1,12 +1,12 @@
 {
         "alpha": {
-          "start": 0.1,
-          "end": 0.1
+          "start": 0.01,
+          "end": 0.015
         },
         "scale": {
           "start": 0.15,
           "end": 0.2,
-          "minimumScaleMultiplier": 0.5
+          "minimumScaleMultiplier": 0.2
         },
         "color": {
           "start": "ffffff",
@@ -57,7 +57,7 @@
         "spawnType": "rect",
         "spawnRect": {
           "x": -500,
-          "y": 1000,
+          "y": 800,
           "w": 1800,
           "h": 20
         }

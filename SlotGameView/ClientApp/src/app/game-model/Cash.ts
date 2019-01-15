@@ -4,9 +4,9 @@ import { LiteEvent } from './Infrastructure/LiteEvent';
 export class Cash {
 
 
-    private _count: number;
-    private _currency: Currency;
+    constructor( private _currency: Currency=Currency.USD, private _count: number=0) {
 
+    }
     public get count(): number {
         return this._count;
     }

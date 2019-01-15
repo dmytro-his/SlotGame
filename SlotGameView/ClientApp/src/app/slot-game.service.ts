@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map } from "rxjs/operators";
+import { map, share } from "rxjs/operators";
 import { Observable } from 'rxjs';
 import { GameResponseBase } from './game-model/GameResponseBase';
 import { GameResponseOK } from './game-model/GameResponseOK';
@@ -25,8 +25,8 @@ export class SlotGameService {
     if (this._gameSessionId != null)
       return this.GetCurrentState();
 
-    var response = this.http.get<any>('http://localhost:52886/slotGame/init');
-    response.subscribe((data) => this._gameSessionId = data.sessionId)
+    var response = this.http.get<any>('http://localhost:52886/slotGame/init').pipe(share());
+    response.subscribe((data) => this._gameSessionId = data.sessionId);
     return response;
   }
 

@@ -4,13 +4,14 @@ import { NgModule } from '@angular/core';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { SlotGameComponent } from './slot-game/slot-game.component';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { GameDashboardComponent } from './game-dashboard/game-dashboard.component';
-import { AnimationJsonService } from './animation-json.service';import {
-  MatToolbarModule, MatButtonModule, MatSidenavModule, MatIconModule, MatListModule,
+import {
+  MatToolbarModule, MatButtonModule, MatSidenavModule, MatListModule,
   MatGridListModule, MatCardModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatSortModule, MatInputModule, MatCheckboxModule,
   MatTabsModule, MatExpansionModule, MatSnackBarModule, MatAutocompleteModule
 } from '@angular/material';
+import {MatIconModule} from '@angular/material/icon';
 
 import { LayoutModule } from '@angular/cdk/layout';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -41,18 +42,16 @@ import { SlotGameService } from './slot-game.service';
     MatListModule,
     MatGridListModule,
     MatCardModule,
-    MatMenuModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
     MatInputModule,
-    MatCheckboxModule,
     MatTabsModule,
     MatExpansionModule,
     MatSnackBarModule,
     MatAutocompleteModule
   ],
-  providers: [AnimationJsonService, SlotGameService], // why . .. 
+  providers: [SlotGameService, HttpClient], // why . .. 
   bootstrap: [AppComponent]
 })
 export class AppModule { }
