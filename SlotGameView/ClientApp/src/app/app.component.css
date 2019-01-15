@@ -1,9 +1,23 @@
-.center {
-    
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-  top:100px;
+
+  .active {color:purple;}
+  
+  .mat-toolbar {
+    background: #212121;
   }
   
-  .active {color:red;}
+  .spacer {
+    flex: 1 1 auto;
+  }
+  
+  .logo {
+    margin: 0px 10px;
+    font-size: 35px;
+    padding-right: 50px;
+    font-style: italic;
+  }
+  
+  a{
+    font-size: 18px;
+    text-decoration: none;
+    color: white;
+  }

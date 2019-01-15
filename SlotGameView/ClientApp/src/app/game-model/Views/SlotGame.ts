@@ -3,6 +3,7 @@ import { SignWinStatus } from '../SignWinStatus';
 import { Currency } from '../Currency';
 import { AnimationJsonService } from '../../animation-json.service';
 import { EventEmitter } from 'events';
+import { LiteEvent } from '../Infrastructure/LiteEvent';
 
 /// <reference path="../../../node_modules/pixi-particles/ambient.d.ts/>
 require('pixi-particles')
@@ -12,14 +13,20 @@ declare var require: any;
 
 export class SlotGame extends EventEmitter {
 
+
     private stage: any;
     private renderer: any;
 
+    Destroy(): any {
+        this.renderer.destroy();
+    }
     constructor(private element: any, private gameViewModel: GameViewModel, private settingsService: AnimationJsonService) {
         super();
         var width = 1280;
         var height = 720;
 
+        var onReelsComplete: LiteEvent<void> = new LiteEvent<void>();
+        var onSpinStarted: LiteEvent<void> = new LiteEvent<void>();
         // this.stage = new PIXI.Container();
         // // this.renderer = PIXI.autoDetectRenderer(width, height, { element });
         // this.renderer = new PIXI.CanvasRenderer(1280, 720);
@@ -97,7 +104,7 @@ export class SlotGame extends EventEmitter {
             function reelsComplete() {
                 tweening = [];
                 running = false;
-                // this.gameViewModel.cash = 
+                onReelsComplete.raise();
             }
 
         }
@@ -283,7 +290,7 @@ export class SlotGame extends EventEmitter {
                 }
 
                 running = true;
-                // this.gameViewModel.cash -= this.gameViewModel.bet;//just for animation. but also all doing at server side
+                onSpinStarted.raise();
                 console.log(this.gameViewModel);
                 this.gameViewModel.Spin();
             })
@@ -298,10 +305,8 @@ export class SlotGame extends EventEmitter {
             cashInfo.x = width / 2 + 200;
             cashInfo.y = height - (margin + cashInfo.height) / 2;
 
-            console.log(width);
-            console.log(height);
             var cashText = new PIXI.Text(`Cash:\n${this.gameViewModel.cash.count}`, style);
-            cashText.x = 35;
+            cashText.x = 30;
             cashText.y = 30;
             cashInfo.addChild(cashText);
             cashInfo.interactive = true;
@@ -310,8 +315,29 @@ export class SlotGame extends EventEmitter {
 
             this.stage.addChild(cashInfo);
 
-            this.gameViewModel.cash.onChangeEvent.subscribe(() => cashText.text = `Cash:\n${this.gameViewModel.cash.count}`);
-            // var updateCash = () => cashText.text = `Cash:\n${this.gameViewModel.cash.count}`;
+
+            
+            var profitInfo = PIXI.Sprite.fromImage('assets/buttons/rock.png');
+            profitInfo.scale.x = 1.5;
+            profitInfo.x = width - 200;
+            profitInfo.y = height - (margin + cashInfo.height) / 2;
+
+            var profitText = new PIXI.Text('Profit', style);
+            profitText.x = 30;
+            profitText.y = 30;
+            profitInfo.addChild(profitText);
+            profitInfo.interactive = true;
+            profitInfo.on('pointerover', () => profitText.text = Currency[this.gameViewModel.lastSpinResult.profit.currency].toString())
+                .on('pointerout', () => profitText.text = `Profit:\n${this.gameViewModel.lastSpinResult.profit.count}`);
+
+            this.stage.addChild(profitInfo);
+
+            onReelsComplete.subscribe(() => cashText.text = `Cash:\n${this.gameViewModel.cash.count}`);
+            onSpinStarted.subscribe(() => cashText.text = `Cash:\n${this.gameViewModel.cash.count-this.gameViewModel.bet.count}`);
+
+            
+            onReelsComplete.subscribe(() => profitText.text = `Profit:\n${this.gameViewModel.lastSpinResult.profit.count}`);
+
 
             var frontStage = PIXI.Sprite.fromImage('');
             this.stage.addChild(frontStage);
@@ -395,29 +421,29 @@ export class SlotGame extends EventEmitter {
 
         }
 
-        // var count = 0;
+        var count = 0;
 
-        // app.ticker.add(() => {
+        this.renderer.ticker.add(() => {
 
-        //     if (winSign.length > 0) {
-        //         winSign.forEach(ws => {
-        //             ws.scale.x = ws.beginScale.x + Math.cos(count) * 0.05;
-        //             ws.scale.y = ws.beginScale.y + Math.cos(count) * 0.05;
-        //         });
+            if (winSign.length > 0 && winSign.some(ws => slotTextures.indexOf(ws.texture) < 4)) {
+                winSign.forEach(ws => {
+                    ws.scale.x = ws.beginScale.x + Math.cos(count) * 0.05;
+                    ws.scale.y = ws.beginScale.y + Math.cos(count) * 0.05;
+                });
 
 
-        //         count += 0.2;
+                count += 0.2;
 
-        //         var matrix = winSignFilter.matrix;
+                var matrix = winSignFilter.matrix;
 
-        //         // matrix[1] = Math.sin(count) * 3;
-        //         matrix[2] = Math.cos(count);
-        //         // matrix[3] = Math.cos(count) * 1.5;
-        //         // matrix[4] = Math.sin(count / 3) * 2;
-        //         // matrix[5] = Math.sin(count / 2);
-        //         // matrix[6] = Math.sin(count );
-        //     }
-        // });
+                // matrix[1] = Math.sin(count) * 3;
+                matrix[2] = Math.cos(count);
+                // matrix[3] = Math.cos(count) * 1.5;
+                // matrix[4] = Math.sin(count / 3) * 2;
+                // matrix[5] = Math.sin(count / 2);
+                // matrix[6] = Math.sin(count );
+            }
+        });
 
         // var lastChange =0;
         // var lastTween=0;
@@ -437,7 +463,7 @@ export class SlotGame extends EventEmitter {
                     if (t.complete)
                         t.complete(t);
                 }
-            }); 
+            });
             // this.renderer.render(this.stage);
             // requestAnimationFrame(tweenFunc.bind(this));
         };

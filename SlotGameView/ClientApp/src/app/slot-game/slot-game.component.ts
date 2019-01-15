@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { SlotGameService } from '../slot-game.service';
 // import { Guid } from "guid-typescript";
 import { GameResponseOK } from '../game-model/GameResponseOK';
@@ -15,32 +15,28 @@ import { SlotGame } from '../game-model/Views/SlotGame';
   templateUrl: './slot-game.component.html',
   styleUrls: ['./slot-game.component.css']
 })
-export class SlotGameComponent implements OnInit {
+export class SlotGameComponent implements OnInit, OnDestroy {
 
   @ViewChild('pixiContainer') pixiContainer;
+
+  private game: SlotGame;
   constructor(private service: SlotGameService, private animateService: AnimationJsonService) {
 
   }
 
   ngOnInit() {
-    console.log('1');
     var loader = new Loader();
-    console.log('2');
     loader.load(loadCallBack.bind(this));
 
-    console.log('3');
     function loadCallBack() {
-      console.log('4');
       var gameViewModel = new GameViewModel(this.service);
-      console.log('5');
       gameViewModel.Init(() => {
-        console.log('6');
-        new SlotGame(this.pixiContainer, gameViewModel, this.animateService);
-
-        console.log('7');
+        this.game = new SlotGame(this.pixiContainer, gameViewModel, this.animateService);
       });
 
-      console.log('8');
     };
+  }
+  ngOnDestroy(): void {
+    this.game.Destroy();
   }
 }
