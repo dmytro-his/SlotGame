@@ -8,12 +8,14 @@ using System.Threading.Tasks;
 
 namespace TestGameModel
 {
+
     class Program
     {
-        static void Main(string[] args)
+       
+        static  void Main(string[] args)
         {
-            int spinCount = 50;
-            int cashCount = 10000;
+            int spinCount = 1000000;
+            int cashCount = 100000000;
             Cash bet = new Cash(Currency.EUR, 1000);
             Console.WriteLine($"SpinCount: {spinCount}");
             Console.WriteLine($"CashCount: {cashCount}");
@@ -66,8 +68,8 @@ namespace TestGameModel
                 //if (game.Cash.Count < 0)
                 //    break;
 
-                //if (i % (spinCount / 100) == 0)
-                //    Console.WriteLine(i / (spinCount / 100));
+                if (i % (spinCount / 100) == 0)
+                    Console.WriteLine(i / (spinCount / 100));
             }
 
             string resultInfo = String.Empty;

@@ -330,8 +330,8 @@ export class SlotGame /*eventemiter*/ {
             this.stage.addChild(profitInfo);
 
             onSpinStarted.subscribe(() => {
-
-                notWinSignFilter.matrix[2]=0;
+                
+                winSignFilter.matrix[2]=0;
                 winSign.forEach(ws => ws.filters = []);
                 notWinSign.forEach(nws => nws.filters = []);
                 winSign = [];
