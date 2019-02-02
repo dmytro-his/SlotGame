@@ -12,7 +12,6 @@ using SlotGameService.Models;
 
 namespace SlotGameService.Controllers
 {
-    //[EnableCors()]
     public class SlotGameController : Controller
     {
         readonly IHappySlotsRepository _repository;
@@ -22,6 +21,7 @@ namespace SlotGameService.Controllers
             this._repository = repository;
         }
 
+        [Route("[controller]/[action]")]
         public Response Init()
         {
             HappySlotGame game = null;
@@ -46,8 +46,8 @@ namespace SlotGameService.Controllers
             //     return new ErrorResponse(game?.Guid ?? Guid.Empty, e);
             // }
         }
-        
-        //[HttpPost]
+
+        [Route("[controller]/[action]")]
         public Response Spin(Guid sessionId, decimal bet)
         {
             var game = this._repository.GetGame(sessionId);
@@ -88,7 +88,7 @@ namespace SlotGameService.Controllers
 
         }
 
-
+        [Route("[controller]/[action]")]
         public Response GetCurrentState([BindRequired, FromQuery]Guid sessionId)
         {
             var game = this._repository.GetGame(sessionId);

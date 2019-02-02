@@ -26,22 +26,13 @@ namespace SlotGameService
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            app.UseCors(builder =>
-    builder.WithOrigins("http://localhost:4200")
-           .AllowAnyHeader()
-    );
+            app.UseCors(builder =>builder.WithOrigins("http://localhost:4200").AllowAnyHeader());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
-            app.UseMvc(routes =>
-            {
-
-                routes.MapRoute(name: null, template: "SlotGame/Spin",
-                    defaults: new { controller = "SlotGame", action = "Spin" });
-
-                routes.MapRoute(name: null, template: "{controller=SlotGame}/{action=Init}");
-            });
+            app.UseMvcWithDefaultRoute();
         }
     }
 }
