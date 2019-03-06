@@ -43,8 +43,5 @@ export class SlotGameService {
       .set('bet', bet.toString());
 
     return this.http.get<any>('http://localhost:52886/slotGame/spin', { params });
-
   }
 }
-
-
