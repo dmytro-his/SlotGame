@@ -1,5 +1,5 @@
 # SlotGame
-This is slot game. Just first my experience with a SPA. 
+This is slot game. Just first experience with a SPA. 
 
 ## **Return to Player (RTP): 96-97 %**
 
